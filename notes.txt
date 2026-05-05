@@ -1,7 +1,0 @@
-- ctangular matrix
-- manual initialization (all fuel and then remove/change to ground, limited to a number of cells)b.gauza@ia.uz.zgora.pl
-- Neightbourhood type??
-- Porbabilistic burning in neighbourhood
-- set time of burning
-- Provide state and stats (%burning, burnt, distance spread)
-
