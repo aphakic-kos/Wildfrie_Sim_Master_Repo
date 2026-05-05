@@ -16,6 +16,25 @@ class Rules:
 	def increment(self, i, j):
 		counting_matrix[i][j] +=1
 
+	def spread_probability(self):
+		for i in range(num_of_rows):
+			for j in range(num_of_columns):
+				current_value = grid[i][j]
+				match current_value:
+					case -1:
+						return 0.0
+					case 0:
+						p = 0.15 * counting_matrix[i][j]
+						return p
+					case 1:
+						p = 0.25 * counting_matrix[i][j]
+                                                return p
+					case 2:
+                                                return 0
+					case 3:
+						p = 0.1 * counting_matrix[i][j]
+                                                return p
+
 	def count_neighbors(self):
 		#iteration over rows
 		for i in range(num_of_rows):
