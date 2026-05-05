@@ -30,16 +30,26 @@ class MapCreator:
         self.num_rows = num_rows
         self.num_cols = num_cols
 
-    # creates random map
+    # This method creates random map
     # usage: .random_map()
     def random_map(self):
         for i in range(self.num_rows):
             for j in range(self.num_cols):
-                self.grid[i, j] = random.choices(CHOICES)
+                self.grid[i, j] = random.choices(CHOICES[1 : 2])
 
-    #
-    def custom_grid(self, list):
-        pass
+    # The method receives list of commands.
+    # The method fills the proper values in the matrix
+    # The commands should be list of vectors of size 3
+    # First component of the vector notifies the row index
+    # Second component of the vector notifies the column index
+    # Third component of the vector notifies the stage
+    # usage: custom_grid(commands)
+    def custom_grid(self, commands):
+        for command in commands:
+            row = command[0]
+            col = command[1]
+            value = command[2]
+            self.grid[row, col] = value
     
     # saves the current map configuration
     # usage: .save_data(path, output)
@@ -74,14 +84,14 @@ class Map:
         return X_size, Y_size
     
     # This method returns the value at the specific position.
-    # The output value of this method can be 0, 1, 2, 3.
+    # The output value of this method can be -1, 0, 1, 2, 3.
     # usage: .get_value(row, col)
     def get_value(self, row, col):
         return (self.curr_map[row, col])
 
 
     # This method sets the value at the specific position.
-    # The input value of this method can be 0, 1, 2, 3.
+    # The input value of this method can be -1, 0, 1, 2, 3.
     # For any other input value, method throws an exception.
     # usage: .set_value(row, col, input)
     def set_value(self, row, col, input):
