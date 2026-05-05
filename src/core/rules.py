@@ -11,6 +11,7 @@ class Rules:
 		self.counting_matrix = np.zeros_like(grid)
 		self.num_of_rows = grid.shape[0]
 		self.num_of_columns = grid.shape[1]
+		print("where the fuck is my commit")
 
 	#increments the value of (i, j) cell in counting matrix
 	def increment(self, i, j):
