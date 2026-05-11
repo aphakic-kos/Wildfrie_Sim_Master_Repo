@@ -1,6 +1,6 @@
 #imports
 
-#from where_current_grid_lives.py import current_grid
+from board.py import Map
 from board.py import BARRIER, GROUND, VEGETATION, BURNING, BURNT
 import numpy as np
 import random
@@ -17,8 +17,9 @@ class Rules:
 	#from one grid point to another. working with von_neumann
 	#neighborhood
 
-	def __init__(self, grid):
-		self.grid = grid
+	def __init__(self):
+		Grid = Map()
+		self.grid = Grid.curr_map
 		#holds number of burning neighbors for the cell
 		self.counting_matrix = np.zeros_like(grid)
 		self.num_of_rows = grid.shape[0]
@@ -49,6 +50,8 @@ class Rules:
 				p = BURNT_REIGNITING_PROBABILITY * self.counting_matrix[row][column]
                                 return p
 
+	#--------------Function that will be used from outside-------------------------#
+
 	#returns value of cell (row, column) to build new grid
 	def new_cell(self, row, column):
 		current_value = self.grid[row][column]
@@ -71,6 +74,8 @@ class Rules:
 				if random.random() < spread_probability(row, column):
 					return BURNING
                                 return BURNT
+
+	#-----------------------------------------------------------------------------#
 
 	#if the cell is barier or burning returns true.
 	#if the current cell is barier or burning we dont count the neighbors
