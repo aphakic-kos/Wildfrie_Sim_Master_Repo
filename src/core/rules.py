@@ -1,10 +1,21 @@
+#imports
+
+#from where_current_grid_lives.py import current_grid
+from board.py import BARRIER, GROUND, VEGETATION, BURNING, BURNT
+import numpy as np
+import random
+
+#constants
+
+GROUND_BURNING_PROBABILITY = 0.15
+VEGETATION_BURNING_PROBABILITY = 0.25
+LONG_LASTING_FIRE_PROBABILITY = 0.15
+BURNT_REIGNITING_PROBABILITY = 0.1
+
 class Rules:
 	#Rules class imposes rules on how the fire should spread
 	#from one grid point to another. working with von_neumann
 	#neighborhood
-
-	from board.py import BARRIER, GROUND, VEGETATION, BURNING, BURNT
-	import numpy as np
 
 	def __init__(self, grid):
 		self.grid = grid
@@ -24,23 +35,42 @@ class Rules:
 			case BARRIER:
 				return 0.0
 			case GROUND:
-				p = 0.15 * self.counting_matrix[row][column]
+				p = GROUND_BURNING_PROBABILITY * self.counting_matrix[row][column]
 				return p
 			case VEGETATION:
-				p = 0.25 * self.counting_matrix[row][column]
+				p = VEGETATION_BURNING_PROBABILITY * self.counting_matrix[row][column]
                                 return p
 			case BURNING:
-                                return 0
+				#lets fire burning in current cell continue with some probability.
+				if random.random() < LONG_LASTING_FIRE_PROBABILITY:
+					return 1.0
+				return 0.0
 			case BURNT:
-				p = 0.1 * self.counting_matrix[row][column]
+				p = BURNT_REIGNITING_PROBABILITY * self.counting_matrix[row][column]
                                 return p
 
-	#builds the matrix of probability of burning (i, j) cell
-	def probability(self):
-		P = np.zeros_like(self.grid)
-		for row in range(self.num_of_rows):
-			for column in range(sef.num_of_columns):
-				P[row][column] = spread_probability(row, column)
+	#returns value of cell (row, column) to build new grid
+	def new_cell(self, row, column):
+		current_value = self.grid[row][column]
+		match current_value:
+			case BARRIER:
+				return BARRIER
+			case GROUND:
+				if random.random() < spread_probability(row, column):
+					return BURNING
+				return GROUND
+			case VEGETATION:
+				if random.random() < spread_probability(row, column):
+					return BURNING
+                                return VEGETATION
+			case BURNING:
+				#lets fire burning in current cell continue with some probability.
+					#return long_lasting_fire()
+                                return BURNT
+			case BURNT:
+				if random.random() < spread_probability(row, column):
+					return BURNING
+                                return BURNT
 
 	#if the cell is barier or burning returns true.
 	#if the current cell is barier or burning we dont count the neighbors
