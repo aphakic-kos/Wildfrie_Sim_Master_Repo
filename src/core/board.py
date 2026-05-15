@@ -37,14 +37,61 @@ class MapCreator:
             for j in range(self.num_cols):
                 self.grid[i, j] = random.choices(CHOICES[1 : 2])
 
+    # This method creates seeded_map
+    # At the begining, we consider that we have 
+    # default map with only ground. Now, at the
+    # randomly chosen cell vegetation is seeded
+    # and expanded on random direction. This will
+    # create chain of wegetation that will cover
+    # the map.
+    # usage .seeded_map(Num_Vegetation)
+    def seeded_map(self, Num_Vegetation):
+        rows = self.num_rows
+        cols = self.num_rows
+        visited = np.zeros([rows, cols], dtype = bool)
+        start_i = np.random.randint(0, rows - 1)
+        start_j = np.random.randint(0, cols - 1)
+
+        self.__helper_seeded_map(Num_Vegetation, visited,
+                               start_i, start_j)
+
+    # Helper method for creating vegetation
+    # Starts from the given point and implements
+    # the vegetation chain of size Num_Vegetation
+    # usage: non-usable
+    def __helper_seeded_map(self, Num_Vegetation,
+                            visited, start_i, start_j):
+        curr_i = start_i
+        curr_j = start_j
+
+        for step in range(Num_Vegetation):
+            visited[curr_i, curr_j] = True 
+            self.grid[curr_i, curr_j] = VEGETATION
+            curr_i, curr_j = self.__getTranslation(visited, curr_i, curr_j)
+
+    # Helper method for translation of the cell.
+    # Finds random translation for the cell and
+    # returns new current position
+    def __getTranslation(self, visited, curr_i, curr_j):
+        rows, cols = visited.shape
+        dx, dy = 0, 0
+        while(True):
+            dx = np.random.randint(-1, 2)
+            dy = np.random.randint(-1, 2)
+            if(curr_i + dx < 0 | curr_i + dx > rows - 1 |
+               curr_j + dy < 0 | curr_j + dy > cols - 1 |
+               visited[curr_i + dx, curr_j + dy]):
+                continue
+        return curr_i + dx, curr_j + dy
+    
     # The method receives list of commands.
     # The method fills the proper values in the matrix
     # The commands should be list of vectors of size 3
     # First component of the vector notifies the row index
     # Second component of the vector notifies the column index
     # Third component of the vector notifies the stage
-    # usage: custom_grid(commands)
-    def custom_grid(self, commands):
+    # usage: .custom_grid(commands)
+    def custom_map(self, commands):
         for command in commands:
             row = command[0]
             col = command[1]
