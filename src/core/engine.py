@@ -8,27 +8,6 @@ import rules
 
 # MAP GENERATION
 
-#First step is the initialisation of the grid size 
-
-class MapGeneration(board.MapCreator):
-
-    def __init__(self, seed, num_rows, num_cols, path, output):
-        self.gen_type = gen_type
-        super(MapGeneration).__init__(num_rows, num_cols)
-        if self.seed == 'random':
-            self.random_map()
-        elif self.seed == 'trail':
-            self.trail_map()
-        else:
-            raise ValueError('invalid seed input')
-        self.save_data(path, output)
-
-    def add_barriers(self, filename, row, col, path, output)
-        super(MapGeneration).__init__(fiename)
-        self.build_barrier(row, col)
-        self.save_data(path, output)
-
-
 class Simuation(board.Map, rules.Rules):
     def __init__(self, total_steps, filename, grid)
         self.total_steps = total_steps

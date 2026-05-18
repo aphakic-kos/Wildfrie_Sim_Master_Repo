@@ -16,7 +16,7 @@ CHOICES = [BARRIER,
            VEGETATION,
            BURNING,
            BURNT]
-
+ 
 #--------------------------------------------------------------
 # MapCreator class:
 # This class stores the .npy files with the information
@@ -35,7 +35,7 @@ class MapCreator:
     def random_map(self):
         for i in range(self.num_rows):
             for j in range(self.num_cols):
-                self.grid[i, j] = random.choices(CHOICES[1 : 2])
+                self.grid[i, j] = random.choice(CHOICES[1 : 3])
 
     # This method creates seeded_map
     # At the begining, we consider that we have 
@@ -45,44 +45,39 @@ class MapCreator:
     # create chain of wegetation that will cover
     # the map.
     # usage .seeded_map(Num_Vegetation)
-    def seeded_map(self, Num_Vegetation):
+    def trailed_map(self, Num_Vegetation):
+        Num_Vegetation = min(Num_Vegetation, self.num_rows * self.num_cols)
         rows = self.num_rows
         cols = self.num_rows
         visited = np.zeros([rows, cols], dtype = bool)
         start_i = np.random.randint(0, rows - 1)
         start_j = np.random.randint(0, cols - 1)
 
-        self.__helper_seeded_map(Num_Vegetation, visited,
-                               start_i, start_j)
-
-    # Helper method for creating vegetation
-    # Starts from the given point and implements
-    # the vegetation chain of size Num_Vegetation
-    # usage: non-usable
-    def __helper_seeded_map(self, Num_Vegetation,
-                            visited, start_i, start_j):
         curr_i = start_i
         curr_j = start_j
 
         for step in range(Num_Vegetation):
-            visited[curr_i, curr_j] = True 
             self.grid[curr_i, curr_j] = VEGETATION
-            curr_i, curr_j = self.__getTranslation(visited, curr_i, curr_j)
-
-    # Helper method for translation of the cell.
-    # Finds random translation for the cell and
-    # returns new current position
-    def __getTranslation(self, visited, curr_i, curr_j):
-        rows, cols = visited.shape
-        dx, dy = 0, 0
-        while(True):
-            dx = np.random.randint(-1, 2)
-            dy = np.random.randint(-1, 2)
-            if(curr_i + dx < 0 | curr_i + dx > rows - 1 |
-               curr_j + dy < 0 | curr_j + dy > cols - 1 |
-               visited[curr_i + dx, curr_j + dy]):
-                continue
-        return curr_i + dx, curr_j + dy
+            visited[curr_i, curr_j] = True
+            di, dj = 0, 0
+            attempts = 0
+            while(attempts < 100):
+                di = np.random.randint(-1, 2)
+                dj = np.random.randint(-1, 2)
+                temp_i = curr_i + di
+                temp_j = curr_j + dj
+                if not (self.__out_of_bounds(temp_i, temp_j) or
+                        visited[temp_i, temp_j]):
+                    curr_i, curr_j = temp_i, temp_j
+                    break
+                attempts += 1
+                
+    # helper method to determine valid cell position                     
+    def __out_of_bounds(self, row, col):
+        cond1 = row < 0 or row > self.num_rows - 1
+        cond2 = col < 0 or col > self.num_cols - 1
+        return (cond1 or cond2)
+ 
     
     # The method receives list of commands.
     # The method fills the proper values in the matrix
@@ -115,7 +110,7 @@ class Map:
         # importing data from the text file
         data = np.load(filename)
 
-        self.init_map = data # creating the initial map
+        self.init_map = data.copy() # creating the initial map
         self.curr_map = data # creating the current map
 
         #saving the size of the map
