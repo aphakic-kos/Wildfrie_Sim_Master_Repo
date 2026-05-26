@@ -16,7 +16,7 @@ CHOICES = [BARRIER,
            VEGETATION,
            BURNING,
            BURNT]
-
+ 
 #--------------------------------------------------------------
 # MapCreator class:
 # This class stores the .npy files with the information
@@ -35,16 +35,58 @@ class MapCreator:
     def random_map(self):
         for i in range(self.num_rows):
             for j in range(self.num_cols):
-                self.grid[i, j] = random.choices(CHOICES[1 : 2])
+                self.grid[i, j] = random.choice(CHOICES[1 : 3])
 
+    # This method creates seeded_map
+    # At the begining, we consider that we have 
+    # default map with only ground. Now, at the
+    # randomly chosen cell vegetation is seeded
+    # and expanded on random direction. This will
+    # create chain of wegetation that will cover
+    # the map.
+    # usage .seeded_map(Num_Vegetation)
+    def trailed_map(self, Num_Vegetation):
+        Num_Vegetation = min(Num_Vegetation, self.num_rows * self.num_cols)
+        rows = self.num_rows
+        cols = self.num_rows
+        visited = np.zeros([rows, cols], dtype = bool)
+        start_i = np.random.randint(0, rows - 1)
+        start_j = np.random.randint(0, cols - 1)
+
+        curr_i = start_i
+        curr_j = start_j
+
+        for step in range(Num_Vegetation):
+            self.grid[curr_i, curr_j] = VEGETATION
+            visited[curr_i, curr_j] = True
+            di, dj = 0, 0
+            attempts = 0
+            while(attempts < 100):
+                di = np.random.randint(-1, 2)
+                dj = np.random.randint(-1, 2)
+                temp_i = curr_i + di
+                temp_j = curr_j + dj
+                if not (self.__out_of_bounds(temp_i, temp_j) or
+                        visited[temp_i, temp_j]):
+                    curr_i, curr_j = temp_i, temp_j
+                    break
+                attempts += 1
+                
+    # helper method to determine valid cell position                     
+    def __out_of_bounds(self, row, col):
+        cond1 = row < 0 or row > self.num_rows - 1
+        cond2 = col < 0 or col > self.num_cols - 1
+        return (cond1 or cond2)
+ 
+    
     # The method receives list of commands.
     # The method fills the proper values in the matrix
     # The commands should be list of vectors of size 3
     # First component of the vector notifies the row index
     # Second component of the vector notifies the column index
     # Third component of the vector notifies the stage
-    # usage: custom_grid(commands)
-    def custom_grid(self, commands):
+    # usage: .custom_grid(commands)
+    def custom_map(self, commands):
         for command in commands:
             row = command[0]
             col = command[1]
@@ -68,7 +110,7 @@ class Map:
         # importing data from the text file
         data = np.load(filename)
 
-        self.init_map = data # creating the initial map
+        self.init_map = data.copy() # creating the initial map
         self.curr_map = data # creating the current map
 
         #saving the size of the map
