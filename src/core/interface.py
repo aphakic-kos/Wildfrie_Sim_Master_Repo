@@ -1,5 +1,7 @@
 from numpy.lib import row_stack
 from board import Map, MapCreator
+from rules import Rules
+from engine import Simuation
 import numpy as np
 import os
 
@@ -153,7 +155,6 @@ class Interface:
 
 Interface.get_map_shape()
 Interface.get_map_type()
-
 I = Interface()
 print(I.map.curr_map)
 
