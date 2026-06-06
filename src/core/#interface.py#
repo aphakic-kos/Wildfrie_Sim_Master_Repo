@@ -179,6 +179,6 @@ print(I.map.curr_map)
 
 N = input("Please enter number of frames: ")
 
-Engine.run_wildfire_animation(I.map, N, 50)
+Engine.run_wildfire_animation(I.map, N, 50) 
 print(I.map.curr_map)
 

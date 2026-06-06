@@ -113,7 +113,7 @@ class Map:
         self.init_map = data.copy() # creating the initial map
         self.curr_map = data # creating the current map
 
-        #saving the size of the map
+        # saving the size of the map
         self.num_rows = len(data)
         self.num_cols = len(data[0])
 

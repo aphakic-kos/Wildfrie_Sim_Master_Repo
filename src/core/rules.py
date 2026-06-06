@@ -27,13 +27,15 @@ class CountingMatrix:
     #CountingMatrix is subclass of Rules class which holds the methods associated with
     #building the counting matrix.
 
-    def __init__(self):
-        Grid = Map()
-        self.grid = Grid.curr_map
+    def __init__(self, map):
+        self.grid = map.curr_map
         #holds number of burning neighbors for the cell
-        self.counting_matrix = np.zeros_like(grid)
-        self.num_of_rows = grid.shape[0]
-        self.num_of_columns = grid.shape[1]
+        self.counting_matrix = np.zeros_like(self.grid)
+        
+        self.num_of_rows = self.grid.shape[0]
+        self.num_of_columns = self.grid.shape[1]
+
+        CountingMatrix.__count_neighbors(self)
 
     #counting matrix method returns the number of burning neighbors for grid as a matrix
     def __count_neighbors(self):
@@ -154,38 +156,36 @@ class Rules:
     #from one grid point to another. working with von_neumann
     #neighborhood
 
-    def __init__(self):
-        Grid = Map()
-        CountingMatrix = CountingMatrix()
-        self.counting_matrix = CountingMatrix.counting_matrix
-        self.grid = Grid.curr_map
+    def __init__(self, map):
+        self.counting_matrix = CountingMatrix(map)
+        self.grid = map.curr_map
 
     #depending on the number of neighbors and cell type, returns corresponding probability. (numbers can change  (-_-) )
     def __spread_probability(self, row, column):
-        current_value = self.grid[row][column]
+        current_value = self.grid[row, column]
+        neighboors = self.counting_matrix.counting_matrix[row, column]
         match current_value:
             case Variables.BARRIER:
                 return 0.0
             case Variables.GROUND:
-                p = GROUND_BURNING_PROBABILITY * self.counting_matrix[row][column]
+                p = GROUND_BURNING_PROBABILITY * neighboors
                 return p
             case Variables.VEGETATION:
-                p = VEGETATION_BURNING_PROBABILITY * self.counting_matrix[row][column]
+                p = VEGETATION_BURNING_PROBABILITY * neighboors
                 return p
             case Variables.BURNING:
                 #lets fire burning in current cell continue with some probability.
-                if random.random() < LONG_LASTING_FIRE_PROBABILITY:
-                    return 1.0
-                return 0.0
+                return LONG_LASTING_FIRE_PROBABILITY
+                    
             case Variables.BURNT:
-                p = BURNT_REIGNITING_PROBABILITY * self.counting_matrix[row][column]
+                p = BURNT_REIGNITING_PROBABILITY * neighboors
                 return p
 
     #--------------Function that will be used from outside-------------------------#
 
     #returns value of cell (row, column) to build new grid
     def new_cell(self, row, column):
-        current_value = self.grid[row][column]
+        current_value = self.grid[row, column]
         match current_value:
             case Variables.BARRIER:
                 return BARRIER
@@ -200,6 +200,8 @@ class Rules:
             case Variables.BURNING:
                 #lets fire burning in current cell continue with some probability.
                 #return long_lasting_fire()
+                if random.random() < self.__spread_probability(row, column):
+                    return BURNING
                 return BURNT
             case Variables.BURNT:
                 if random.random() < self.__spread_probability(row, column):
